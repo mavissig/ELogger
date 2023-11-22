@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"elogger/internal/app"
+)
 
 func main() {
-	fmt.Println("Service run")
+	app.Run()
 }
