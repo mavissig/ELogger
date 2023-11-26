@@ -5,28 +5,31 @@ import (
 	"net/http"
 )
 
-type IMock interface {
+type Controller interface {
 	Mock(http.ResponseWriter, *http.Request)
+	LogIP(http.ResponseWriter, *http.Request)
 }
 
 type Http struct {
-	mock IMock
+	controller Controller
+}
+
+func (s *Http) registry() {
+	http.HandleFunc("/mock", s.controller.Mock)
+	http.HandleFunc("/info", s.controller.LogIP)
 }
 
 func (s *Http) RunServer() {
-	http.HandleFunc("/mock", s.mock.Mock)
+	s.registry()
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-func New(m IMock) *Http {
+func New(c Controller) *Http {
 	s := Http{
-		mock: m,
+		controller: c,
 	}
-
-	s.RunServer()
-
 	return &s
 }
